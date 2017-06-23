@@ -10,10 +10,13 @@ private:
 	GLfloat end_time;
 
 public:
+	Path();
 	Path(const char *pathFilename);
 	PathPoint* getNextPoint();
 
 	GLfloat getStartTime();
 	GLfloat getEndTime();
+
+	void reset();
 
 };

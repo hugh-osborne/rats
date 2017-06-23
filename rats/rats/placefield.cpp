@@ -63,15 +63,13 @@ std::tuple<int, int, float> PlaceField::findMaxDivision(Path &path, PlaceCell &p
       }
     }
   }
-
-  printf("Max Spike Likelihood : %f at [%i,%i]\n", max_spiking, std::get<0>(max_spiking_coords), std::get<1>(max_spiking_coords));
-
+	
  GLfloat dim = 2.0f / num_divisions;
   for(int i=0; i<num_divisions; i++) {
     for (int j=0; j<num_divisions; j++) {
       float alpha = 0.0f;
       if(visit_counts[i][j] > 0 && total_likelihood > 0.0f) {
-        alpha = (GLfloat)((float)spike_counts[i][j]/(float)visit_counts[i][j]) / total_likelihood;
+        alpha = (GLfloat)((float)spike_counts[i][j]/(float)visit_counts[i][j]);
       }
 		divisions.addSprite(Sprite(glm::vec2((i*dim) - 1.0f + (dim / 2.0f), (j*dim) - 1.0f + (dim / 2.0f)), glm::vec2(dim / 2.0f, dim / 2.0f),
 			glm::vec4(1.0f, 0.0f, 0.0f, alpha), 1.0f));

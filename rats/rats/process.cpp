@@ -27,6 +27,9 @@ void Process::init(const char * inputfilename) {
 	std::ofstream output(field_coords_file.c_str(),std::ofstream::out | std::ofstream::trunc);
 	output << "track,day,run,unit,coordx,coordy,max\n";
 
+	std::string current_run_filename("");
+	Path current_path;
+
 	for (std::string line; std::getline(input, line); ) {
 		std::vector<std::string> chunks = StringSplit::split(line, ',');
 
@@ -43,12 +46,19 @@ void Process::init(const char * inputfilename) {
 		const char * outfilename = chunks[6].c_str();
 		const char * imagefilename = chunks[7].c_str();
 
-		printf("load %s\n", runfilename);
-		Path p = Path(runfilename);
-		PlaceCell pc = PlaceCell(spikefilename, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), true, p.getStartTime(), p.getEndTime(), outfilename);
+		printf("Process %s %s %s %s\n", track, day, run, unit);
+
+		if(current_run_filename.compare(runfilename) != 0) {
+			current_path = Path(runfilename);
+			current_run_filename = std::string(runfilename);
+		} else {
+			current_path.reset();
+		}
+
+		PlaceCell pc = PlaceCell(spikefilename, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), true, current_path.getStartTime(), current_path.getEndTime(), outfilename);
 
 		PlaceField pf = PlaceField();
-		std::tuple<int,int,float> max = pf.findMaxDivision(p, pc);
+		std::tuple<int,int,float> max = pf.findMaxDivision(current_path, pc);
 
 		glutPostRedisplay();
 		glClear(GL_COLOR_BUFFER_BIT);

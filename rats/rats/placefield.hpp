@@ -9,7 +9,7 @@
 
 class PlaceField {
 private:
-  const static int num_divisions = 11;
+  const static int num_divisions = 25;
   std::vector<std::vector<int> > spike_counts;
   std::vector<std::vector<int> > visit_counts;
 

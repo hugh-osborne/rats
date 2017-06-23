@@ -11,6 +11,10 @@
 #include "../include/GL/glut.h"
 #include "stringsplit.hpp"
 
+Path::Path() {
+	
+}
+
 Path::Path(const char *filename) {
 	std::ifstream input(filename);
 
@@ -67,4 +71,10 @@ GLfloat Path::getStartTime() {
 
 GLfloat Path::getEndTime() {
 	return end_time;
+}
+
+void Path::reset() {
+	current_point = points.begin();
+	start_time = points.front().time;
+	end_time = points.back().time;
 }
