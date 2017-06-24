@@ -30,7 +30,7 @@ std::tuple<int,int> PlaceField::getCoords(glm::vec2 location) {
   return std::make_tuple(x, y);
 }
 
-std::tuple<int, int, float> PlaceField::findMaxDivision(Path &path, PlaceCell &place_cell) {
+std::vector<std::vector<float> >  PlaceField::findMaxDivision(Path &path, PlaceCell &place_cell) {
   PathPoint *pp = path.getNextPoint();
 	place_cell.getNextTime();
 
@@ -63,20 +63,28 @@ std::tuple<int, int, float> PlaceField::findMaxDivision(Path &path, PlaceCell &p
       }
     }
   }
-	
+
+  std::vector<std::vector<float> > spike_rates;
+
  GLfloat dim = 2.0f / num_divisions;
   for(int i=0; i<num_divisions; i++) {
+	  std::vector<float> spike_row;
     for (int j=0; j<num_divisions; j++) {
       float alpha = 0.0f;
       if(visit_counts[i][j] > 0 && total_likelihood > 0.0f) {
         alpha = (GLfloat)((float)spike_counts[i][j]/(float)visit_counts[i][j]);
-      }
+		spike_row.push_back(alpha);
+	  }
+	  else {
+		  spike_row.push_back(0.0f);
+	  }
 		divisions.addSprite(Sprite(glm::vec2((i*dim) - 1.0f + (dim / 2.0f), (j*dim) - 1.0f + (dim / 2.0f)), glm::vec2(dim / 2.0f, dim / 2.0f),
 			glm::vec4(1.0f, 0.0f, 0.0f, alpha), 1.0f));
     }
+	spike_rates.push_back(spike_row);
   }
 
-  return std::make_tuple(std::get<0>(max_spiking_coords), std::get<1>(max_spiking_coords), max_spiking);
+  return spike_rates;
 }
 
 void PlaceField::drawBoxes() {

@@ -25,7 +25,7 @@ void Process::init(const char * inputfilename) {
 	std::getline(input, field_coords_file);
 
 	std::ofstream output(field_coords_file.c_str(),std::ofstream::out | std::ofstream::trunc);
-	output << "track,day,run,unit,coordx,coordy,max\n";
+	output << "track,day,run,unit,spike_rates\n";
 
 	std::string current_run_filename("");
 	Path current_path;
@@ -58,7 +58,7 @@ void Process::init(const char * inputfilename) {
 		PlaceCell pc = PlaceCell(spikefilename, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), true, current_path.getStartTime(), current_path.getEndTime(), outfilename);
 
 		PlaceField pf = PlaceField();
-		std::tuple<int,int,float> max = pf.findMaxDivision(current_path, pc);
+		std::vector<std::vector<float> > spike_rates = pf.findMaxDivision(current_path, pc);
 
 		glutPostRedisplay();
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -68,7 +68,14 @@ void Process::init(const char * inputfilename) {
 
 		writeRenderTexture(imagefilename);
 
-		output << track << "," << day << "," << run << "," << unit << "," << std::get<0>(max) << "," << std::get<1>(max) << "," << std::get<2>(max) << "\n";
+		output << track << "," << day << "," << run << "," << unit;
+		for (int i = 0; i < spike_rates.size(); i++) {
+			for (int j = 0; j < spike_rates[i].size(); j++) {
+				output << "," << spike_rates[i][j];
+			}
+		}
+
+		output << "\n";
 
 	}
 

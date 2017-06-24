@@ -19,7 +19,7 @@ private:
 public:
 	PlaceField();
 	std::tuple<int,int> getCoords(glm::vec2 location);
-	std::tuple<int, int, float> findMaxDivision(Path &path, PlaceCell &place_cell);
+	std::vector<std::vector<float> > findMaxDivision(Path &path, PlaceCell &place_cell);
 	void drawBoxes();
 	void drawField();
 };
