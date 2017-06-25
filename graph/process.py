@@ -24,6 +24,7 @@ def compareUnitSpikes(spikes) :
     series = range(0,len(spikes))
     times = range(0,len(spikes[0]))
     ordering = [[s for s in series if spikes[s][t] == 1] for t in times ]
+    ordering = [x for x in ordering if len(x) > 0]
     return [x[0] for x in groupby(ordering)]
 
 def compareFields(field1, field2) :
