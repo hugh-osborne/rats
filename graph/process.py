@@ -2,6 +2,8 @@ import csv
 import numpy as np
 from itertools import groupby
 import matplotlib.pyplot as plt
+import matplotlib.patches as pch
+from os import listdir
 
 division_dim = 25
 division_size = 1.0/division_dim
@@ -81,16 +83,43 @@ diff1 = compareFields(getPlaceField(placefields,4,2,'11_1'),getPlaceField(placef
 diff2 = compareFields(getPlaceField(placefields,4,2,'11_1'),getPlaceField(placefields,4,4,'1_10'))
 print([diff1,diff2])
 
-placecell1 = loadSpikes('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/unit_11_1.txt')
-placecell2 = loadSpikes('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/unit_13_1.txt')
-pc_var = np.var(placecell1)
-print(pc_var)
+fig1 = plt.figure()
+ax1 = fig1.add_subplot(111)
 
-unit_spikes1 = smoothUnitSpikes(placecell1, 3)
-unit_spikes2 = smoothUnitSpikes(placecell2, 3)
-print(unit_spikes1)
-print(unit_spikes2)
+files = listdir('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/')
+unit_spikes = []
 
-overlaps = compareUnitSpikes([unit_spikes1,unit_spikes2])
+ax1.set_xlim([0,1000])
+ax1.set_ylim([0,0.1*len(files)])
+ax1.yaxis.set_visible(False)
+
+file_pos = 0
+for f in files :
+    placecell1 = loadSpikes('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/' + f)
+    #pc_var = np.var(placecell1)
+    #print(pc_var)
+
+    ax1.text(-1.0, file_pos + 0.01, f[5:-4],
+        verticalalignment='bottom', horizontalalignment='right',
+        #transform=ax1.transAxes,
+        color='black', fontsize=10)
+
+    unit_spikes1 = smoothUnitSpikes(placecell1, 2)
+    unit_spikes.append(unit_spikes1)
+    #print(unit_spikes1)
+
+    for s in range(0,len(unit_spikes1)) :
+        if unit_spikes1[s] == 1 :
+            ax1.add_patch(
+                pch.Rectangle(
+                    (s, file_pos),   # (x,y)
+                    1,          # width
+                    0.1,          # height
+                facecolor="blue")
+            )
+    file_pos += 0.1
+
+plt.show()
+
+overlaps = compareUnitSpikes(unit_spikes)
 print(overlaps)
-

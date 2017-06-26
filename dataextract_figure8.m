@@ -1,6 +1,6 @@
 
-experiment_name = 'i01_maze06_MS.002';
-behav_file = strcat(experiment_name, '_raw/', experiment_name, '_BehavElectrData.mat');
+experiment_name = 'i01_maze09_MS.002';
+behav_file = strcat(experiment_name, '_raw/', experiment_name, '_BehavElectrDataLFP.mat');
 pos_file = strcat(experiment_name, '_raw/', experiment_name, '_1250Hz.whl.interp.mat');
 
 try

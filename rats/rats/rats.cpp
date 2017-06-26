@@ -87,13 +87,9 @@ void animateRats(int argc, char** argv) {
 }
 
 void processDraw(void) {
-	//glClear(GL_COLOR_BUFFER_BIT);
-
-	//glFlush();
 }
 
 void processInit() {
-
 }
 
 void processAnimate(int argc, char** argv) {
