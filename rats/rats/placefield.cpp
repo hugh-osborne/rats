@@ -72,7 +72,7 @@ std::vector<std::vector<float> >  PlaceField::findMaxDivision(Path &path, PlaceC
     for (int j=0; j<num_divisions; j++) {
       float alpha = 0.0f;
       if(visit_counts[i][j] > 0 && total_likelihood > 0.0f) {
-        alpha = (GLfloat)((float)spike_counts[i][j]/(float)visit_counts[i][j]);
+        alpha = (GLfloat)(((float)spike_counts[i][j]/(float)visit_counts[i][j])/max_spiking);
 		spike_row.push_back(alpha);
 	  }
 	  else {

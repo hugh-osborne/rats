@@ -72,12 +72,62 @@ def loadPlaceFieldsFromFile(filename) :
 def pickSmallFields(fields, size) :
     return [f for f in fields if f[5] - f[4] < size or f[7] - f[6] < size]
 
+def placeWTrackFieldAreaStats() :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_6/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_7/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_8/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_9/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_10/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_1/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_2/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_4/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_6/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_7/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_8/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_9/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_1/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_2/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_4/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_6/placefields.txt'))
+    areas = [(f[5]-f[4])*(f[7]-f[6]) for f in placefields]
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
+    ax1.set_title('Histogram of Place Field Area (W Track)')
+    ax1.set_xlabel('place field size (% area of the track)')
+    ax1.set_ylabel('frequency')
+    ax1.hist(areas, 50, range=[0.0,1.0], histtype='bar',rwidth=0.9)
+    plt.show()
+    pf_area_mean = np.mean(areas)
+    pf_area_var = np.std(areas)
+    print( ['mean and variance:', pf_area_mean, pf_area_var])
+
+def placeF8TrackFieldAreaStats() :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/i01_maze06_MS.002/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/i01_maze06_MS.005/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/i01_maze08_MS.001/placefields.txt'))
+    areas = [(f[5]-f[4])*(f[7]-f[6]) for f in placefields]
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
+    ax1.set_title('Histogram of Place Field Area (Figure 8 Track)')
+    ax1.set_xlabel('place field size (% area of the track)')
+    ax1.set_ylabel('frequency')
+    ax1.hist(areas, 50, range=[0.0,1.0], histtype='bar',rwidth=0.9)
+    plt.show()
+    pf_area_mean = np.mean(areas)
+    pf_area_var = np.std(areas)
+    print( ['mean and variance:', pf_area_mean, pf_area_var])
+
+#placeWTrackFieldAreaStats()
+placeF8TrackFieldAreaStats()
+
 placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
-print(placefields)
-areas = [(f[5]-f[4])*(f[7]-f[6]) for f in pickSmallFields(placefields, 0.4)]
-pf_area_mean = np.mean(areas)
-pf_area_var = np.var(areas)
-print( [pf_area_mean, pf_area_var])
 
 diff1 = compareFields(getPlaceField(placefields,4,2,'11_1'),getPlaceField(placefields,4,4,'11_1'))
 diff2 = compareFields(getPlaceField(placefields,4,2,'11_1'),getPlaceField(placefields,4,4,'1_10'))

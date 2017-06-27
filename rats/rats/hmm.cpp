@@ -11,13 +11,23 @@
 HMM::HMM(PlaceCell *pc, GLfloat start_time, GLfloat end_time) {
 
 	// define markov model
+	// Good for Frank data
 	p_outfield_to_infield = 0.1f;
 	p_infield_to_outfield = 0.3f;
-	p_infield_spike = 0.9f;
-	p_outfield_spike = 0.2f;
+	p_infield_spike = 0.99f;
+	p_outfield_spike = 0.4f;
 	alpha_infield = 1.0f * p_infield_spike; // assume we're in the field to begin with
 	alpha_outfield = 0.0f;
 	bin_size = 1.0f;
+
+	// Good for figure 8 data
+	// p_outfield_to_infield = 0.1f;
+	// p_infield_to_outfield = 0.3f;
+	// p_infield_spike = 0.9f;
+	// p_outfield_spike = 0.7f;
+	// alpha_infield = 1.0f * p_infield_spike; // assume we're in the field to begin with
+	// alpha_outfield = 0.0f;
+	// bin_size = 30.0f;
 
 	std::ofstream output(pc->getOutputFilename());
 
@@ -63,8 +73,8 @@ HMM::HMM(PlaceCell *pc, GLfloat start_time, GLfloat end_time) {
 		GLfloat prob_infield = alpha_infield / (alpha_infield + alpha_outfield);
 		GLfloat prob_outfield = alpha_outfield / (alpha_infield + alpha_outfield);
 
-		spike_model.push_back( (prob_infield >= prob_outfield) ? spike_obs[i] : std::vector<GLfloat>());
-		//spike_model.push_back(spike_obs[i]);
+		//spike_model.push_back( (prob_infield >= prob_outfield) ? spike_obs[i] : std::vector<GLfloat>());
+		spike_model.push_back(spike_obs[i]);
 	}
 
 	for ( int i=0; i<spike_model.size(); i++) {
