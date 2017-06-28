@@ -1,11 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>bon/bon_4/process_input.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>i01_maze09_MS.002/run.txt i01_maze09_MS.002/spikes/unit_34.txt pc1.txt 1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Process|x64'">
     <LocalDebuggerCommandArguments>bon_4_4_run/run.txt bon_4_4_run/spikes/spike_11_1.txt pc1.txt 1</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>i01_maze09_MS.002/run.txt i01_maze09_MS.002/spikes/unit_34.txt pc1.txt 1</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

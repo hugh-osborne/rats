@@ -34,10 +34,8 @@ def compareFields(field1, field2) :
     spikes2 = field2[8:(division_dim*division_dim)+8]
     return np.linalg.norm(np.subtract(spikes2,spikes1))
 
-def getPlaceField(placefields, day, run, unit) :
-    for f in placefields :
-        if f[1] == day and f[2] == run and f[3] == unit :
-            return f
+def getPlaceFields(placefields, track, unit) :
+    return [f for f in placefields if f[0] == track and f[3] == unit]
 
 def loadPlaceFieldsFromFile(filename) :
     placefields = []
@@ -124,14 +122,32 @@ def placeF8TrackFieldAreaStats() :
     pf_area_var = np.std(areas)
     print( ['mean and variance:', pf_area_mean, pf_area_var])
 
-#placeWTrackFieldAreaStats()
-placeF8TrackFieldAreaStats()
+def trackPlaceFieldChange(track, unit) :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_6/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_7/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_8/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_9/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_10/placefields.txt'))
+    unit_placefields = getPlaceFields(placefields, track, unit)
+    diffs = []
+    for p in range(0,len(unit_placefields)-1) :
+        diffs.append(compareFields(unit_placefields[p], unit_placefields[p+1]))
+    print(diffs)
+    return diffs
+
+placeWTrackFieldAreaStats()
+#placeF8TrackFieldAreaStats()
+
+trackPlaceFieldChange('TrackB', '11_1')
+trackPlaceFieldChange('TrackB', '13_4')
+trackPlaceFieldChange('TrackB', '12_3')
+trackPlaceFieldChange('TrackB', '2_4')
+trackPlaceFieldChange('TrackB', '14_1')
 
 placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
-
-diff1 = compareFields(getPlaceField(placefields,4,2,'11_1'),getPlaceField(placefields,4,4,'11_1'))
-diff2 = compareFields(getPlaceField(placefields,4,2,'11_1'),getPlaceField(placefields,4,4,'1_10'))
-print([diff1,diff2])
 
 fig1 = plt.figure()
 ax1 = fig1.add_subplot(111)

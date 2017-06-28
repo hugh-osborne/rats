@@ -10,7 +10,6 @@
 
 Rat *rat;
 Path *path;
-//KMeans *kmeans;
 PlaceField *pf;
 Process *process;
 
@@ -25,10 +24,6 @@ void display(void) {
 
 	rat->draw();
 
-	pf->drawBoxes();
-
-//	kmeans->drawCentroids();
-
 	glFlush();
 }
 
@@ -39,10 +34,10 @@ void init(const char * runfilename, const char * spikefilename, bool fade) {
 
 	rat = new Rat(glm::vec2(0.5,0.5), glm::vec2(0.1,0.1), fade ? 0.9995f : 1.0f);
 	rat->addPlaceCell(new PlaceCell(spikefilename, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), output_filename));
-	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_13_4.txt", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc2.txt"));
-	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_12_3.txt", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc3.txt"));
-	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_2_4.txt", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc4.txt"));
-	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_14_1.txt", glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc5.txt"));
+	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_13_4.txt", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc2.txt"));
+	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_12_3.txt", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc3.txt"));
+	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_2_4.txt", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc4.txt"));
+	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_14_1.txt", glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc5.txt"));
 
 	rat->setAndFollowPath(path);
 
@@ -56,8 +51,6 @@ void update() {
 void shutdown() {
 	delete rat;
 	delete path;
-	//delete kmeans;
-	delete pf;
 }
 
 void animateRats(int argc, char** argv) {
@@ -96,9 +89,9 @@ void processAnimate(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 
-	//animateRats(argc, argv);
+	animateRats(argc, argv);
 
-  processInit();
+  /*processInit();
   processAnimate(argc, argv);
 
 	process = new Process();
@@ -106,7 +99,7 @@ int main(int argc, char** argv) {
 
   glutMainLoop();
 
-  delete process;
+  delete process;*/
 
 	return 0;
 }

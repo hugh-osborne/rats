@@ -1,5 +1,5 @@
-#define LINUX
-//#define WIN
+//#define LINUX
+#define WIN
 
 #ifdef WIN
 #include "../include/GL/glew.h"
