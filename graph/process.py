@@ -29,6 +29,22 @@ def compareUnitSpikes(spikes) :
     ordering = [x for x in ordering if len(x) > 0]
     return [x[0] for x in groupby(ordering)]
 
+def displayAddFields(fields) :
+    rates = np.zeros(division_dim*division_dim)
+    for f in fields :
+        rates += np.array(f[8:(division_dim*division_dim)+8])
+    rates = np.array([r if r < 1 else 1 for r in rates])
+    rates = rates.reshape(division_dim, division_dim)
+    fig1 = plt.figure()
+    #plt.imshow(f, cmap='hot', interpolation='nearest')
+    plt.pcolor(rates.transpose(),cmap=plt.cm.Reds)
+    plt.colorbar()
+    plt.show()
+
+def displayCoverage() :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/i01_maze08_MS.001/placefields.txt')
+    displayAddFields(pickSmallFields(placefields,0.5))
+
 def compareFields(field1, field2) :
     spikes1 = field1[8:(division_dim*division_dim)+8]
     spikes2 = field2[8:(division_dim*division_dim)+8]
@@ -69,6 +85,15 @@ def loadPlaceFieldsFromFile(filename) :
 
 def pickSmallFields(fields, size) :
     return [f for f in fields if f[5] - f[4] < size or f[7] - f[6] < size]
+
+def displayPlaceField(field) :
+    f = np.array(field[8:(division_dim*division_dim)+8])
+    f = f.reshape(division_dim, division_dim)
+    fig1 = plt.figure()
+    #plt.imshow(f, cmap='hot', interpolation='nearest')
+    plt.pcolor(f.transpose(),cmap=plt.cm.Reds)
+    plt.colorbar()
+    plt.show()
 
 def placeWTrackFieldAreaStats() :
     placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
@@ -138,7 +163,24 @@ def trackPlaceFieldChange(track, unit) :
     print(diffs)
     return diffs
 
-placeWTrackFieldAreaStats()
+def trackPlaceFieldShift(track, unit) :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_6/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_7/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_8/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_9/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_10/placefields.txt'))
+    unit_placefields = getPlaceFields(placefields, track, unit)
+    diffs = []
+    test_unit = unit_placefields[0]
+    for p in range(1,len(unit_placefields)) :
+        diffs.append(compareFields(unit_placefields[p], test_unit))
+    print(diffs)
+    return diffs
+
+#placeWTrackFieldAreaStats()
 #placeF8TrackFieldAreaStats()
 
 trackPlaceFieldChange('TrackB', '11_1')
@@ -147,45 +189,67 @@ trackPlaceFieldChange('TrackB', '12_3')
 trackPlaceFieldChange('TrackB', '2_4')
 trackPlaceFieldChange('TrackB', '14_1')
 
+trackPlaceFieldShift('TrackB', '11_1')
+trackPlaceFieldShift('TrackB', '13_4')
+trackPlaceFieldShift('TrackB', '12_3')
+trackPlaceFieldShift('TrackB', '2_4')
+trackPlaceFieldShift('TrackB', '14_1')
+
+placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_5/placefields.txt'))
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_6/placefields.txt'))
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_7/placefields.txt'))
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_8/placefields.txt'))
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_9/placefields.txt'))
+placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_10/placefields.txt'))
+
+#displayAddFields(getPlaceFields(placefields,'TrackB', '11_1'))
+displayCoverage()
+
 placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
 
-fig1 = plt.figure()
-ax1 = fig1.add_subplot(111)
+#displayPlaceField(getPlaceFields(placefields,'TrackB', '11_1')[0])
+#displayPlaceField(getPlaceFields(placefields,'TrackB', '11_1')[1])
 
-files = listdir('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/')
-unit_spikes = []
+def showBoxPlot() :
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
 
-ax1.set_xlim([0,1000])
-ax1.set_ylim([0,0.1*len(files)])
-ax1.yaxis.set_visible(False)
+    files = listdir('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/')
+    unit_spikes = []
 
-file_pos = 0
-for f in files :
-    placecell1 = loadSpikes('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/' + f)
-    #pc_var = np.var(placecell1)
-    #print(pc_var)
+    ax1.set_xlim([0,1000])
+    ax1.set_ylim([0,0.1*len(files)])
+    ax1.yaxis.set_visible(False)
 
-    ax1.text(-1.0, file_pos + 0.01, f[5:-4],
-        verticalalignment='bottom', horizontalalignment='right',
-        #transform=ax1.transAxes,
-        color='black', fontsize=10)
+    file_pos = 0
+    for f in files :
+        placecell1 = loadSpikes('../rats/rats/bon/bon_4/bon_4_4_run/smoothed/' + f)
+        #pc_var = np.var(placecell1)
+        #print(pc_var)
 
-    unit_spikes1 = smoothUnitSpikes(placecell1, 2)
-    unit_spikes.append(unit_spikes1)
-    #print(unit_spikes1)
+        ax1.text(-1.0, file_pos + 0.01, f[5:-4],
+            verticalalignment='bottom', horizontalalignment='right',
+            #transform=ax1.transAxes,
+            color='black', fontsize=10)
 
-    for s in range(0,len(unit_spikes1)) :
-        if unit_spikes1[s] == 1 :
-            ax1.add_patch(
-                pch.Rectangle(
-                    (s, file_pos),   # (x,y)
-                    1,          # width
-                    0.1,          # height
-                facecolor="blue")
-            )
-    file_pos += 0.1
+        unit_spikes1 = smoothUnitSpikes(placecell1, 2)
+        unit_spikes.append(unit_spikes1)
+        #print(unit_spikes1)
 
-plt.show()
+        for s in range(0,len(unit_spikes1)) :
+            if unit_spikes1[s] == 1 :
+                ax1.add_patch(
+                    pch.Rectangle(
+                        (s, file_pos),   # (x,y)
+                        1,          # width
+                        0.1,          # height
+                    facecolor="blue")
+                )
+        file_pos += 0.1
 
-overlaps = compareUnitSpikes(unit_spikes)
-print(overlaps)
+    plt.show()
+
+    overlaps = compareUnitSpikes(unit_spikes)
+    print(overlaps)
