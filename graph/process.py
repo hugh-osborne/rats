@@ -29,26 +29,46 @@ def compareUnitSpikes(spikes) :
     ordering = [x for x in ordering if len(x) > 0]
     return [x[0] for x in groupby(ordering)]
 
-def displayAddFields(fields) :
+def displayAddFields(fields, track_name, size_type) :
     rates = np.zeros(division_dim*division_dim)
     for f in fields :
         rates += np.array(f[8:(division_dim*division_dim)+8])
     rates = np.array([r if r < 1 else 1 for r in rates])
     rates = rates.reshape(division_dim, division_dim)
     fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
+    ax1.set_title('Heatmap of Normalised Place Cell Activity\nAcross the ' + track_name + ' ( ' + size_type + ' )\n')
+    ax1.yaxis.set_visible(False)
+    ax1.xaxis.set_visible(False)
     #plt.imshow(f, cmap='hot', interpolation='nearest')
     plt.pcolor(rates.transpose(),cmap=plt.cm.Reds)
     plt.colorbar()
     plt.show()
 
 def displayCoverage() :
-    placefields = loadPlaceFieldsFromFile('../rats/rats/i01_maze08_MS.001/placefields.txt')
-    displayAddFields(pickSmallFields(placefields,0.5))
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields = [p for p in placefields if p[1] == 4 and p[2] == 2]
+    displayAddFields(pickSmallFields(placefields,1.0),'W Track', 'All PFs')
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields = [p for p in placefields if p[1] == 4 and p[2] == 2]
+    displayAddFields(pickSmallFields(placefields,0.4),'W Track', 'PFs < 0.4 of track')
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields = [p for p in placefields if p[1] == 4 and p[2] == 6]
+    displayAddFields(pickSmallFields(placefields,1.0),'W Track', 'All PFs')
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
+    placefields = [p for p in placefields if p[1] == 4 and p[2] == 6]
+    displayAddFields(pickSmallFields(placefields,0.4),'W Track', 'PFs < 0.4 of track')
+    placefields = loadPlaceFieldsFromFile('../rats/rats/i01_maze06_MS.002/placefields.txt')
+    displayAddFields(pickSmallFields(placefields,1.0),'Figure 8 Track', 'All PFs')
+    placefields = loadPlaceFieldsFromFile('../rats/rats/i01_maze06_MS.002/placefields.txt')
+    displayAddFields(pickSmallFields(placefields,0.5),'Figure 8 Track', 'PFs < 0.4 of track')
 
 def compareFields(field1, field2) :
     spikes1 = field1[8:(division_dim*division_dim)+8]
     spikes2 = field2[8:(division_dim*division_dim)+8]
-    return np.linalg.norm(np.subtract(spikes2,spikes1))
+    #return np.linalg.norm(np.subtract(spikes2,spikes1))
+    coefs = np.corrcoef([spikes1,spikes2])
+    return coefs[0][1]
 
 def getPlaceFields(placefields, track, unit) :
     return [f for f in placefields if f[0] == track and f[3] == unit]
@@ -66,7 +86,7 @@ def loadPlaceFieldsFromFile(filename) :
             run = int(row[2])
             unit = row[3]
 
-            if track == 'sleep':
+            if track == 'sleep' or track == 'unknown':
                 continue
 
             rates = [float(s) if float(s) > rate_minimum else 0.0 for s in row[4:(division_dim * division_dim) + 4]]
@@ -94,6 +114,20 @@ def displayPlaceField(field) :
     plt.pcolor(f.transpose(),cmap=plt.cm.Reds)
     plt.colorbar()
     plt.show()
+
+def getNumberOfCells(filename) :
+    epochs = {}
+    with open(filename) as csvfile:
+        csvfile.readline() # skip line 1
+        csvfile.readline() # skip line 2
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0]+row[1]+row[2] in epochs :
+                epochs[row[0]+row[1]+row[2]] += 1
+            else :
+                epochs[row[0]+row[1]+row[2]] = 1
+
+    return epochs.values()
 
 def placeWTrackFieldAreaStats() :
     placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
@@ -123,7 +157,7 @@ def placeWTrackFieldAreaStats() :
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111)
     ax1.set_title('Histogram of Place Field Area (W Track)')
-    ax1.set_xlabel('place field size (% area of the track)')
+    ax1.set_xlabel('place field size (proportion of the area of the track)')
     ax1.set_ylabel('frequency')
     ax1.hist(areas, 50, range=[0.0,1.0], histtype='bar',rwidth=0.9)
     plt.show()
@@ -139,7 +173,7 @@ def placeF8TrackFieldAreaStats() :
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111)
     ax1.set_title('Histogram of Place Field Area (Figure 8 Track)')
-    ax1.set_xlabel('place field size (% area of the track)')
+    ax1.set_xlabel('place field size (proportion of the area of the track)')
     ax1.set_ylabel('frequency')
     ax1.hist(areas, 50, range=[0.0,1.0], histtype='bar',rwidth=0.9)
     plt.show()
@@ -147,25 +181,78 @@ def placeF8TrackFieldAreaStats() :
     pf_area_var = np.std(areas)
     print( ['mean and variance:', pf_area_mean, pf_area_var])
 
-def trackPlaceFieldChange(track, unit) :
-    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_5/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_6/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_7/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_8/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_9/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_10/placefields.txt'))
-    unit_placefields = getPlaceFields(placefields, track, unit)
-    diffs = []
-    for p in range(0,len(unit_placefields)-1) :
-        diffs.append(compareFields(unit_placefields[p], unit_placefields[p+1]))
-    print(diffs)
-    return diffs
+def trackAllPlaceFieldShifts() :
+    averages = np.zeros(7)
+    counts = np.ones(7)
+    with open('../rats/rats/bon/bon_3/process_input.txt') as csvfile:
+        csvfile.readline() # skip line 1
+        csvfile.readline() # skip line 2
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0] == 'TrackA' and row[2] == '6':
+                print(['TrackA', row[3]])
+                diffs = trackPlaceFieldShiftBon('TrackA', row[3])
+                for i in range(0,len(diffs)) :
+                    averages[i] += diffs[i]
+                    counts[i] += 1
+    with open('../rats/rats/Cor/Cor_1/process_input.txt') as csvfile:
+        csvfile.readline() # skip line 1
+        csvfile.readline() # skip line 2
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0] == 'TrackA' and row[2] == '4':
+                print(['TrackA', row[3]])
+                diffs = trackPlaceFieldShiftCor('TrackA', row[3])
+                for i in range(0,len(diffs)) :
+                    averages[i] += diffs[i]
+                    counts[i] += 1
+    with open('../rats/rats/Cor/Cor_1/process_input.txt') as csvfile:
+        csvfile.readline() # skip line 1
+        csvfile.readline() # skip line 2
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0] == 'TrackA' and row[2] == '2':
+                print(['TrackA', row[3]])
+                diffs = trackPlaceFieldShiftCor('TrackA', row[3])
+                for i in range(0,len(diffs)) :
+                    averages[i] += diffs[i]
+                    counts[i] += 1
+    with open('../rats/rats/_con/_con_1/process_input.txt') as csvfile:
+        csvfile.readline() # skip line 1
+        csvfile.readline() # skip line 2
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0] == 'TrackA' and row[2] == '2':
+                print(['TrackA', row[3]])
+                diffs = trackPlaceFieldShiftCon('TrackA', row[3])
+                for i in range(0,len(diffs)) :
+                    averages[i] += diffs[i]
+                    counts[i] += 1
+    with open('../rats/rats/_con/_con_1/process_input.txt') as csvfile:
+        csvfile.readline() # skip line 1
+        csvfile.readline() # skip line 2
+        reader = csv.reader(csvfile)
+        for row in reader:
+            if row[0] == 'TrackA' and row[2] == '4':
+                print(['TrackA', row[3]])
+                diffs = trackPlaceFieldShiftCon('TrackA', row[3])
+                for i in range(0,len(diffs)) :
+                    averages[i] += diffs[i]
+                    counts[i] += 1
 
-def trackPlaceFieldShift(track, unit) :
-    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
+    for i in range(0,6) :
+        averages[i] /= counts[i]
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
+    ax1.set_title('Average Correlation Coefficient between the \nFirst Epoch and Subsequent Epochs')
+    ax1.set_xlabel('Epoch Order')
+    ax1.set_ylabel('Correlation Coefficient')
+    ax1.plot(averages)
+    plt.show()
+
+def trackPlaceFieldShiftBon(track, unit) :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt'))
     placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_5/placefields.txt'))
     placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_6/placefields.txt'))
     placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_7/placefields.txt'))
@@ -177,23 +264,46 @@ def trackPlaceFieldShift(track, unit) :
     test_unit = unit_placefields[0]
     for p in range(1,len(unit_placefields)) :
         diffs.append(compareFields(unit_placefields[p], test_unit))
-    print(diffs)
+    #print(diffs)
+    return diffs
+
+def trackPlaceFieldShiftCon(track, unit) :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/_con/_con_1/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_2/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_4/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/_con/_con_6/placefields.txt'))
+    unit_placefields = getPlaceFields(placefields, track, unit)
+    diffs = []
+    test_unit = unit_placefields[0]
+    for p in range(1,len(unit_placefields)) :
+        diffs.append(compareFields(unit_placefields[p], test_unit))
+    #print(diffs)
+    return diffs
+
+def trackPlaceFieldShiftCor(track, unit) :
+    placefields = loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_1/placefields.txt')
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_2/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_3/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_4/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_5/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_6/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_7/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_8/placefields.txt'))
+    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/Cor/Cor_9/placefields.txt'))
+    unit_placefields = getPlaceFields(placefields, track, unit)
+    diffs = []
+    test_unit = unit_placefields[0]
+    for p in range(1,len(unit_placefields)) :
+        diffs.append(compareFields(unit_placefields[p], test_unit))
+    #print(diffs)
     return diffs
 
 #placeWTrackFieldAreaStats()
 #placeF8TrackFieldAreaStats()
 
-trackPlaceFieldChange('TrackB', '11_1')
-trackPlaceFieldChange('TrackB', '13_4')
-trackPlaceFieldChange('TrackB', '12_3')
-trackPlaceFieldChange('TrackB', '2_4')
-trackPlaceFieldChange('TrackB', '14_1')
-
-trackPlaceFieldShift('TrackB', '11_1')
-trackPlaceFieldShift('TrackB', '13_4')
-trackPlaceFieldShift('TrackB', '12_3')
-trackPlaceFieldShift('TrackB', '2_4')
-trackPlaceFieldShift('TrackB', '14_1')
+trackAllPlaceFieldShifts()
 
 placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
 placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_3/placefields.txt'))
@@ -205,7 +315,44 @@ placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_9/placefields.t
 placefields.extend(loadPlaceFieldsFromFile('../rats/rats/bon/bon_10/placefields.txt'))
 
 #displayAddFields(getPlaceFields(placefields,'TrackB', '11_1'))
-displayCoverage()
+#displayCoverage()
+unit_counts = getNumberOfCells('../rats/rats/bon/bon_3/process_input.txt')
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_4/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_5/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_6/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_7/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_8/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_9/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/bon/bon_10/process_input.txt'))
+
+print(np.mean(unit_counts))
+print(max(unit_counts))
+print(min(unit_counts))
+
+unit_counts = getNumberOfCells('../rats/rats/Cor/Cor_1/process_input.txt')
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_2/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_3/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_4/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_5/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_6/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_7/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_8/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/Cor/Cor_9/process_input.txt'))
+
+print(np.mean(unit_counts))
+print(max(unit_counts))
+print(min(unit_counts))
+
+unit_counts = getNumberOfCells('../rats/rats/_con/_con_1/process_input.txt')
+unit_counts.extend(getNumberOfCells('../rats/rats/_con/_con_2/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/_con/_con_3/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/_con/_con_4/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/_con/_con_5/process_input.txt'))
+unit_counts.extend(getNumberOfCells('../rats/rats/_con/_con_6/process_input.txt'))
+
+print(np.mean(unit_counts))
+print(max(unit_counts))
+print(min(unit_counts))
 
 placefields = loadPlaceFieldsFromFile('../rats/rats/bon/bon_4/placefields.txt')
 
