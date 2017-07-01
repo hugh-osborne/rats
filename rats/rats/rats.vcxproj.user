@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>i01_maze09_MS.002/run.txt i01_maze09_MS.002/spikes/unit_34.txt pc1.txt 1</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>bon/bon_4/process_input.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
