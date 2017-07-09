@@ -166,9 +166,7 @@ def placeWTrackFieldAreaStats() :
     print( ['mean and variance:', pf_area_mean, pf_area_var])
 
 def placeF8TrackFieldAreaStats() :
-    placefields = loadPlaceFieldsFromFile('../rats/rats/i01_maze06_MS.002/placefields.txt')
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/i01_maze06_MS.005/placefields.txt'))
-    placefields.extend(loadPlaceFieldsFromFile('../rats/rats/i01_maze08_MS.001/placefields.txt'))
+    placefields = loadPlaceFieldsFromFile('../rats/rats/figure8/placefields.txt')
     areas = [(f[5]-f[4])*(f[7]-f[6]) for f in placefields]
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111)
@@ -301,7 +299,7 @@ def trackPlaceFieldShiftCor(track, unit) :
     return diffs
 
 #placeWTrackFieldAreaStats()
-#placeF8TrackFieldAreaStats()
+placeF8TrackFieldAreaStats()
 
 trackAllPlaceFieldShifts()
 
