@@ -73,8 +73,8 @@ HMM::HMM(PlaceCell *pc, GLfloat start_time, GLfloat end_time) {
 		GLfloat prob_infield = alpha_infield / (alpha_infield + alpha_outfield);
 		GLfloat prob_outfield = alpha_outfield / (alpha_infield + alpha_outfield);
 
-		//spike_model.push_back( (prob_infield >= prob_outfield) ? spike_obs[i] : std::vector<GLfloat>());
-		spike_model.push_back(spike_obs[i]);
+		spike_model.push_back( (prob_infield >= prob_outfield) ? spike_obs[i] : std::vector<GLfloat>());
+		//spike_model.push_back(spike_obs[i]);
 	}
 
 	for ( int i=0; i<spike_model.size(); i++) {

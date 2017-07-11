@@ -25,9 +25,15 @@ PlaceCell::PlaceCell(const char *filename, glm::vec4 col, bool use_hmm, GLfloat 
 	if(use_hmm) {
 		HMM *hmm = new HMM(this, start_time, end_time);
 
-		times = hmm->getSpikeTimes();
-		current_time = &(*times.begin());
-		next_time = times.begin() + 1;
+		std::deque<GLfloat> hmm_times = hmm->getSpikeTimes();
+		if (!hmm_times.empty()) {
+			times = hmm_times;
+			current_time = &(*times.begin());
+			next_time = times.begin() + 1;
+		}
+		else {
+			next_time = times.end();
+		}
 		delete hmm;
 	}
 
