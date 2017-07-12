@@ -34,10 +34,10 @@ void init(const char * runfilename, const char * spikefilename, bool fade) {
 
 	rat = new Rat(glm::vec2(0.5,0.5), glm::vec2(0.1,0.1), fade ? 0.9995f : 1.0f);
 	rat->addPlaceCell(new PlaceCell(spikefilename, glm::vec4(1.0f, 1.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), output_filename));
-	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_13_4.txt", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc2.txt"));
-	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_12_3.txt", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc3.txt"));
-	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_2_4.txt", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc4.txt"));
-	//rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_14_1.txt", glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc5.txt"));
+	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_4_run/spikes/unit_19_1.txt", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc2.txt"));
+	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_4_run/spikes/unit_18_1.txt", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc3.txt"));
+	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_2_4.txt", glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc4.txt"));
+	rat->addPlaceCell(new PlaceCell("bon/bon_4/bon_4_2_run/spikes/unit_14_1.txt", glm::vec4(1.0f, 0.0f, 1.0f, 1.0f), true, path->getStartTime(), path->getEndTime(), "pc5.txt"));
 
 	rat->setAndFollowPath(path);
 
