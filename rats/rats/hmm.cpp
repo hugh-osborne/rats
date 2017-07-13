@@ -12,13 +12,13 @@ HMM::HMM(PlaceCell *pc, GLfloat start_time, GLfloat end_time) {
 
 	// define markov model
 	// Good for Frank data
-	p_outfield_to_infield = 0.1f;
-	p_infield_to_outfield = 0.3f;
-	p_infield_spike = 0.99f;
+	p_outfield_to_infield = 0.2f;
+	p_infield_to_outfield = 0.4f;
+	p_infield_spike = 0.95f;
 	p_outfield_spike = 0.4f;
 	alpha_infield = 1.0f * p_infield_spike; // assume we're in the field to begin with
 	alpha_outfield = 0.0f;
-	bin_size = 1.0f;
+	bin_size = 0.1f;
 
 	// Good for figure 8 data
 	// p_outfield_to_infield = 0.1f;

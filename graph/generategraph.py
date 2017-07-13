@@ -1,4 +1,5 @@
 import csv
+import math
 import numpy as np
 from itertools import groupby
 import matplotlib.pyplot as plt
@@ -32,16 +33,16 @@ def showBoxPlot() :
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111)
 
-    files = listdir('../bon_4_4_run/smoothed/')
+    files = listdir('../bon_4_2_run/smoothed/')
     unit_spikes = []
 
-    ax1.set_xlim([0,1000])
+    ax1.set_xlim([0,10000])
     ax1.set_ylim([0,0.1*len(files)])
     ax1.yaxis.set_visible(False)
 
     file_pos = 0
     for f in files :
-        placecell1 = loadSpikes('../bon_4_4_run/smoothed/' + f)
+        placecell1 = loadSpikes('../bon_4_2_run/smoothed/' + f)
         #pc_var = np.var(placecell1)
         #print(pc_var)
 
@@ -56,7 +57,7 @@ def showBoxPlot() :
         unit_spikes.append(unit_spikes1)
         #print(unit_spikes1)
 
-        for s in range(0,len(unit_spikes1)) :
+        for s in range(1,len(unit_spikes1)) :
             if unit_spikes1[s] == 1 :
                 ax1.add_patch(
                     pch.Rectangle(
@@ -251,14 +252,8 @@ def generateAdjacencyRCC(overlaps, labels) :
         if not PP.has_node(node_x):
             PP.add_node(node_x)
 
-    firing_counts = {}
-    for l in labels:
-        firing_counts[l] = 0
-
     for bin in overlaps:
         nodes = [Node(x) for x in bin]
-        for l in bin:
-            firing_counts[l] += 1
         for i in range(0,len(nodes)):
             for j in range(i,len(nodes)):
                 if not PO.has_edge(nodes[i], nodes[j]):
@@ -293,13 +288,10 @@ def generateAdjacencyRCC(overlaps, labels) :
             node_x = Node(x)
             if not PP.has_node(node_x):
                 PP.add_node(node_x)
+    #PO.remove_nodes_from(pp_nodes)
 
-    print(pp_nodes)
-
-    PO.remove_nodes_from(pp_nodes)
-
-    bad = [(u, v) for (u, v, w) in PO.edges(data='weight') if w <= 6 or u == v] # sort w <=6 it's very unstable!
-
+    # cutoff 25 for W, 140 for figure8
+    bad = [(u, v) for (u, v, w) in PO.edges(data='weight') if w <= 25 or u == v]
     PO.remove_edges_from(bad)
 
     outdeg = PO.degree()
@@ -307,44 +299,7 @@ def generateAdjacencyRCC(overlaps, labels) :
     PO.remove_nodes_from(to_remove)
 
     for node in PO.nodes():
-        # 1-adjacency connectedness
-        # subgraph1 = nx.Graph(PO)
-        # adjacent_nodes = []
-        # for (u,v) in PO.edges([node]):
-        #     adjacent_nodes.append(v)
-        # remove_nodes = [n for n in subgraph1.nodes() if n not in adjacent_nodes]
-        # subgraph1.remove_nodes_from(remove_nodes + [node])
-        # print([node, nx.number_connected_components(subgraph1)] + subgraph1.nodes())
-        #
-        # # 2-adjacency connectedness
-        # subgraph2 = nx.Graph(PO)
-        # adjacent_nodes2 = []
-        # for (u,v) in PO.edges(subgraph1.nodes()):
-        #     adjacent_nodes2.append(v)
-        # remove_nodes = [n for n in subgraph2.nodes() if n not in adjacent_nodes2]
-        # subgraph2.remove_nodes_from(remove_nodes + [node] + adjacent_nodes)
-        # print([node, nx.number_connected_components(subgraph2)] + subgraph2.nodes())
-
-        # closer_nodes = []
-        # prev_adjacent_nodes = [node]
-        # prev_subgraph = nx.Graph()
-        # prev_subgraph.add_node(node)
-        # while True:
-        #     subgraph = nx.Graph(PO)
-        #     adjacent_nodes = []
-        #     for (u,v) in PO.edges(prev_subgraph.nodes()):
-        #         adjacent_nodes.append(v)
-        #     remove_nodes = [n for n in subgraph.nodes() if n not in adjacent_nodes]
-        #     subgraph.remove_nodes_from(remove_nodes + prev_adjacent_nodes)
-        #     if not subgraph.nodes():
-        #         break
-        #     print([node, nx.number_connected_components(subgraph)] + subgraph.nodes())
-        #     prev_subgraph = subgraph
-        #     prev_adjacent_nodes.extend(adjacent_nodes)
-
-        print([node,getNumComponents([node], PO)])
-
-
+        print([node, getNumComponents([node], PO)])
 
     labels = nx.get_edge_attributes(PO, 'weight')
     pos = nx.circular_layout(PO)
@@ -352,6 +307,30 @@ def generateAdjacencyRCC(overlaps, labels) :
     nx.draw_networkx_edge_labels(PO, pos, edge_labels=labels, label_pos=0.5)
     nx.draw_networkx_labels(PO, pos)
     plt.show()
+
+    #weight cutoff plot
+    # totals = []
+    # means = []
+    # for cutoff in range(100,250) :
+    #     graph = nx.Graph(PO)
+    #     bad = [(u, v) for (u, v, w) in graph.edges(data='weight') if w <= cutoff or u == v]
+    #     graph.remove_edges_from(bad)
+    #
+    #     outdeg = graph.degree()
+    #     to_remove = [n for n in graph.nodes() if outdeg[n] == 0]
+    #     graph.remove_nodes_from(to_remove)
+    #
+    #     estimates = []
+    #     for node in graph.nodes():
+    #         estimates.append(getNumComponents([node], graph))
+    #     totals.append(sum(estimates))
+    #     means.append(np.median(estimates))
+    #
+    # fig1 = plt.figure()
+    # ax1 = fig1.add_subplot(111)
+    # ax1.plot(totals)
+    # ax1.plot(means)
+    # plt.show()
 
 def getNumComponents(nodes, graph) :
     #print([nodes, graph.nodes()])
@@ -362,16 +341,16 @@ def getNumComponents(nodes, graph) :
     adjacent_nodes = list(set(adjacent_nodes) - set(nodes))
 
     if not adjacent_nodes:
-        if len(graph.nodes()) <= 1:
-            return 0
-        return 1
+        if len(nodes) > 1:
+            return 1
+        return 0
 
-    subgraph = graph.subgraph([n for n in graph.nodes() if n not in nodes])
+    subgraph = graph.subgraph([n for n in graph.nodes() if n in adjacent_nodes])
 
     separates = nx.connected_components(subgraph)
     count = 0
     for s in separates:
-        count += getNumComponents(adjacent_nodes, graph.subgraph(s))
+        count += getNumComponents(s, graph.subgraph([n for n in graph.nodes() if n not in nodes]))
     if count == 0:
         return 1
     return count
